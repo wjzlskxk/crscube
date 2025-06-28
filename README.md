@@ -9,14 +9,6 @@ CRS Cube 코딩테스트용 레포지토리입니다.
 
 ### [POST] /auth/login
 
-**req**
-```json
-{
-  "username": "전민찬",
-  "password": "qwer1234"
-}
-```
-
 **res**
 ```json
 {
@@ -33,9 +25,106 @@ CRS Cube 코딩테스트용 레포지토리입니다.
 
 ### [POST] /students
 
-**req**
+**res**
 ```json
+{
+    "success": true,
+    "message": "학생이 성공적으로 등록되었습니다.",
+    "data": {
+        "grade": 3,
+      "classNumber": 2,
+      "studentNumber": 16,
+      "name": "전민찬",
+      "birthday": "2007-05-01",
+      "email": "chan2bo2@naver.com",
+      "address": "대구광역시 00구 00동",
+      "phoneNumber": "010-3762-3087",
+      "createdAt": "2025-06-27T23:15:28.158496",
+      "updatedAt": "2025-06-27T23:15:28.158496"
+    },
+    "timestamp": "2025-06-27T23:15:28.158496"
+}
 ```
+
+### [GET] /students
+
+**res**
+```json
+{
+    "success": true,
+    "message": "학생 정보를 성공적으로 조회하였습니다.",
+    "data": [{
+      "grade": 3,
+      "classNumber": 2,
+      "studentNumber": 16,
+      "name": "전민찬",
+      "birthday": "2007-05-01",
+      "email": "chan2bo2@naver.com",
+      "address": "대구광역시 00구 00동",
+      "phoneNumber": "010-3762-3087",
+      "createdAt": "2025-06-27T23:15:28.158496",
+      "updatedAt": "2025-06-27T23:15:28.158496"
+    }],
+    "timestamp": "2025-06-27T23:15:28.158496"
+}
+```
+
+### [GET] /students/{id}
+
+**res**
+```json
+{
+    "success": true,
+    "message": "학생 정보를 성공적으로 조회하였습니다.",
+    "data": {
+      "grade": 3,
+      "classNumber": 2,
+      "studentNumber": 16,
+      "name": "전민찬",
+      "birthday": "2007-05-01",
+      "email": "chan2bo2@naver.com",
+      "address": "대구광역시 00구 00동",
+      "phoneNumber": "010-3762-3087",
+      "createdAt": "2025-06-27T23:15:28.158496",
+      "updatedAt": "2025-06-27T23:15:28.158496"
+    },
+    "timestamp": "2025-06-27T23:15:28.158496"
+}
+```
+
+### [PATCH] /students/{id}
+
+**res**
+```json
+{
+    "success": true,
+    "message": "학생 정보를 성공적으로 수정하였습니다.",
+    "data": {
+      "grade": 3,
+      "classNumber": 2,
+      "studentNumber": 16,
+      "name": "전민돌",
+      "birthday": "2007-05-01",
+      "email": "chan2bo2@naver.com",
+      "address": "대구광역시 00구 00동 1111번지",
+      "phoneNumber": "010-3762-3087",
+      "createdAt": "2025-06-27T23:15:28.158496",
+      "updatedAt": "2025-06-27T23:15:28.158496"
+    },
+    "timestamp": "2025-06-27T23:15:28.158496"
+}
+```
+
+### [DELETE] /students/{id}
+
+**res**
+```json
+{
+  "success": true,
+  "message": "학생을 성공적으로 삭제하였습니다."
+}
+```
+※ 현재 JwtTokenProvider와 JwtTokenFilter를 추가하였지만 계속된 InvalidSignature 에러로, RequestHeader에 Bearer Token을 추가해도 403 Forbidden에러가 발생합니다.
 
 ## 3. Design
 
