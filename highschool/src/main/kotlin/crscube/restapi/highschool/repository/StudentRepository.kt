@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface StudentRepository  : JpaRepository<Student, Long> {
-    fun findByStudentNumber(studentNumber: String): Student?
+    fun findByStudentNumber(studentNumber: Int): Student?
 
     @Query("SELECT s FROM Student s WHERE " +
                 "(:name IS NULL OR s.name LIKE %:name%) AND " +

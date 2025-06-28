@@ -90,7 +90,7 @@ class StudentController(
     fun delteStudent(
         @RequestHeader("Authorization") authorization: String,
         @PathVariable id: Long
-    ): ResponseEntity<ApiResponse<StudentRes>> {
+    ): ResponseEntity<ApiResponse<Void>> {
         val student = studentService.deleteStudent(id)
         return ResponseEntity.ok(
             ApiResponse(

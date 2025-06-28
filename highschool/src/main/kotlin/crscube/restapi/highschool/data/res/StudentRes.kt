@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 data class StudentRes(
     val id: Long,
-    val studentNumber: String,
+    val studentNumber: Int,
     val name: String,
     val grade: Int,
     val classNumber: Int,

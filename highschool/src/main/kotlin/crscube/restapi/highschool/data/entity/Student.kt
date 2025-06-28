@@ -17,7 +17,7 @@ data class Student (
 
     @Column(nullable = false, unique = true)
     @NotBlank()
-    val studentNumber: String,
+    val studentNumber: Int,
 
     @Column(nullable = false)
     @NotBlank()

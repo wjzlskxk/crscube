@@ -4,6 +4,7 @@ import crscube.restapi.highschool.data.req.LoginReq
 import crscube.restapi.highschool.data.res.ApiResponse
 import crscube.restapi.highschool.data.res.LoginRes
 import crscube.restapi.highschool.infrastructure.jwt.JwtTokenProvider
+import crscube.restapi.highschool.service.AuthService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -14,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/auth")
 class AuthController(
-    private val jwtTokenProvider: JwtTokenProvider
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val authService: AuthService
 ) {
 
     @PostMapping("/login")
@@ -25,6 +27,7 @@ class AuthController(
             username = req.username,
             role = "STUDENT"
         )
+        authService.saveUser(req)
         return ResponseEntity.ok(
             ApiResponse(
                 true,

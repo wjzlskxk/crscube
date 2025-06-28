@@ -8,7 +8,7 @@ import java.time.LocalDate
 
 data class StudentCreateReq(
     @NotBlank
-    val studentNumber: String,
+    val studentNumber: Int,
 
     @NotBlank
     val name: String,
