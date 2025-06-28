@@ -179,77 +179,60 @@ Service는 Repository를, UseCase는 Service를 참조하였습니다.
 Repository는 DB 접근을 담당했고, Service는 비즈니스 로직을 처리하였습니다. 또 UseCase에서는 사용자 시나리오 단위의 작업 흐름을 정의하였습니다.
 
 **Pseudocode**
-```java
-// UserRepository.java
-public interface UserRepository extends JpaRepository<UserEntity, Integer> {
-
-    Optional<UserEntity> findByUserId(String userId);
-    boolean existsByUserId(String userId);
+```pseudocode
+// UserRepository 인터페이스
+UserRepository {
+    findByUserId(userId): Optional<UserEntity>
+    existsByUserId(userId): Boolean
 }
 
-// BusinessRepository.java
-public interface BusinessRepository extends JpaRepository<BusinessEntity, Long> {
-
-    boolean existsByBusinessNumber(String businessNumber);
+// BusinessRepository 인터페이스
+BusinessRepository {
+    existsByBusinessNumber(businessNumber): Boolean
 }
 
-// UserService.java
-@Service
-@RequiredArgsConstructor
-public class UserService {
+// UserService 클래스
+UserService {
+    userRepository
+    businessRepository
 
-    private final UserRepository userRepository;
-    private final BusinessRepository businessRepository;
+    existsByUserId(userId):
+        return userRepository.existsByUserId(userId)
 
-    public boolean existsByUserId(String userId) {
-        return userRepository.existsByUserId(userId);
-    }
+    existsByBusinessNumber(businessNumber):
+        return businessRepository.existsByBusinessNumber(businessNumber)
 
-    public boolean existsByBusinessNumber(String businessNumber){
-        return businessRepository.existsByBusinessNumber(businessNumber);
-    }
+    signUp(user):
+        if existsByUserId(user.userId):
+            throw UserAlreadyExistsException
+        userRepository.save(user)
 
-    public void signUp(UserEntity user) {
-        if (existsByUserId(user.getUserId())) {
-            throw new UserAlreadyExistsException();
-        }
-        userRepository.save(user);
-    }
+    signUp(business):
+        if existsByBusinessNumber(business.businessNumber):
+            throw BusinessAlreadyExistsException
+        businessRepository.save(business)
 
-    public void signUp(BusinessEntity business){
-        if (existsByBusinessNumber(business.getBusinessNumber())){
-            throw new BusinessAlreadyExistsException();
-        }
-        businessRepository.save(business);
-    }
-
-    public UserEntity getByUserId(String userId) {
-        return userRepository.findByUserId(userId)
-                .orElseThrow(UserNotFoundException::new);
-    }
-
+    getByUserId(userId):
+        user = userRepository.findByUserId(userId)
+        if user is empty:
+            throw UserNotFoundException
+        return user
 }
 
-//AuthUseCase.java
-@Component
-@RequiredArgsConstructor
-@Transactional(rollbackFor = Exception.class)
-public class AuthUseCase {
+// AuthUseCase 클래스
+AuthUseCase {
+    userService
 
-    private final UserService userService;
-    
-    public ResponseData<UserEntity> login(SignInReq req, HttpSession session) {
-        UserEntity user = userService.getByUserId(req.id());
-        user.checkIfPasswordIsCorrect(Sha512PasswordEncoder.encode(req.password()));
-        session.setAttribute("LOGIN_USER_ID", user.getUserId());
-        return ResponseData.ok("로그인 성공", user);
-    }
+    login(request, session):
+        user = userService.getByUserId(request.id)
+        encodedPassword = encodePassword(request.password)
+        user.checkIfPasswordIsCorrect(encodedPassword)
+        session.setAttribute("LOGIN_USER_ID", user.userId)
+        return ResponseData.ok("로그인 성공", user)
 
-    public Response logout(HttpSession session) {
-        session.invalidate();
-        return Response.ok("로그아웃 성공");
-    }
-
+    logout(session):
+        session.invalidate()
+        return Response.ok("로그아웃 성공")
 }
 ```
 
@@ -302,3 +285,9 @@ public class AuthUseCase {
 
 ## 5. Algorithm
 
+처음에는 학교에 배정된 학생이 학교까지 가야할 거리의 총합이 점수가 낮아야한다는 것을 보고 "그럼 최단거리 아닌가?"로 생각을 해 BFS로 접근하려 했습니다.
+하지만 문제를 자세히 살펴보니 학교와 타운은 각각 좌표가 있는 평면상의 점입니다. 또한 타운의 학생수와 학교의 수용량이 있고 학생들이 학교에 나누어 배정되어야 했습니다.
+BFS는 그래프에서 한 출발지에서 목표지까지의 최단 경로를 탐색할 때 사용하지만 이 문제는 각 타운의 학생들을 학교에 배분해야 하며 학교마다 수용인원이 있기 때문에 단순 최단 거리 탐색과는 다르다고 느꼈습니다.
+그럼에도 BFS를 적용해본다면 좌표를 먼저 격자 구조로 생각해야합니다. 격자구조라면 각 칸을 노드라도 칭했을때 노드는 상하좌우 엣지로 연결 되어있기 때문에 다음 노드로 갈 경로가 명확하기 때문에 BFS로 풀이 할 수 있습니다. 이후 BFS 레벨 별로 주변 학교를 탐색하고, 가장 가까운 학교부터 배정을 한다면 될 것같습니다.
+
+하지만 이 문제는 타운-학교의 좌표가 정수이므로, 좌표간 직선 거리계산이 더 빠르므로, BFS보다는 거리를 기준을 계산하고 정렬하는것이 더 효율적일 것 같습니다.
