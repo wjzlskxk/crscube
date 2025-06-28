@@ -253,3 +253,52 @@ public class AuthUseCase {
 
 }
 ```
+
+## 4. Software Architecture
+
+### 1) 설계 방향
+1. 비동기 작업은 PENDING, IN_PROGRESS, FAILED, COMPLETED의 상태를 가질 수 있습니다.
+2. 작업 흐름
+   1. 작업 생성 시 새 작업이 PENDING 상태로 queue 또는 DB에 등록됨
+   2. EC2가 PENDING 상태인 task를 IN_PROGREESS로 전환 후 처리 시작
+   3. if 실행 중인 task가 중단 된다면 -> 해당 작업은 IN_PROGRESS로 유지 but, 타임아웃이 될 시에 FAILED 혹은 PENDING상태로 변경 후 재시도 가능하게 함
+   4. 작업 성공 시 COMPLETED로 상태 변경
+   5. 작업 실패 시 FAILED나 PENDING 상태로 변경 후 재시도 가능하게 함
+   6. 
+3. 시스템 설계
+   1. 배포 시작
+   2. EC2 Task에 할당된 IN_PROGRESS작업 확인
+   3. Task 종료 전 작업 상태 업데이트 (변경X, 타임아웃으로 롤백 처리)
+   4. 배포 완료 후 Task 재시작
+   5. Watchdog이 중단된 작업을 찾고, 다시 PENDING상태로 변경 해 재시작
+   6. 
+
+### 2) 도식화
+```plain
+ +-------------------+
+ | 작업 생성 (PENDING) |
+ +---------+---------+
+           |
+           v
+ +---------------------+
+ | ECS Task가 작업 수신  |
+ +---------+-----------+
+           |
+           v
+ +---------------------+
+ | 작업 상태: IN_PROGRESS |
+ +---------+-----------+
+           |
+   +-------+-------+
+   |               |
+   v               v
+[완료 성공]      [Task 중단 or 실패]
+   |               |
+   v               v
+[COMPLETED]   [FAILED 또는 PENDING으로 롤백]
+                   |
+                   v
+              [재시도 큐에 재등록]
+```
+
+
