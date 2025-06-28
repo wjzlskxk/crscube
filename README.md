@@ -124,7 +124,6 @@ CRS Cube 코딩테스트용 레포지토리입니다.
   "message": "학생을 성공적으로 삭제하였습니다."
 }
 ```
-※ 현재 JwtTokenProvider와 JwtTokenFilter를 추가하였지만 계속된 InvalidSignature 에러로, RequestHeader에 Bearer Token을 추가해도 403 Forbidden에러가 발생합니다.
 
 ## 3. Design
 
